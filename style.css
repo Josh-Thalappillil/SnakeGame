@@ -9,11 +9,11 @@
 
 #gameContainer{
     text-align: center;
+    background-color: ;
 }
 
 #gameBoard{
     border: 3px solid;
-    background-color: black;
 }
 
 #scoreText{
