@@ -4,12 +4,13 @@ const scoreText = document.querySelector("#scoreText");
 const resetButton = document.querySelector("#resetButton");
 const gameWidth = gameBoard.width;
 const gameHeight = gameBoard.height;
-const boardBackground = "white";
+const boardBackground = "#293447";
 const snakeColor = "lightgreen";
 const snakeBorder = "black";
 const foodColor = "red";
 const unitSize = 25;
 let running = false;
+let tickTimeout;
 let xVelocity = unitSize;
 let yVelocity = 0;
 let foodX;
@@ -37,27 +38,27 @@ function gameStart() {
 };
 function nextTick() {
     if(running){
-        setTimeout(()=>{
+        tickTimeout = setTimeout(() => {
             clearBoard();
             drawFood();
             moveSnake();
             drawSnake();
             checkGameOver();
             nextTick();
-        }, 100)
+        }, 100);
     }
     else{
         displayGameOver();
     }
 };
 function clearBoard() {
+    ctx.clearRect(0, 0, gameWidth, gameHeight);
     ctx.fillStyle = boardBackground;
     ctx.fillRect(0, 0, gameWidth, gameHeight);
 };
 function createFood() {
     function randomFood(min, max) {
-        const randNum = Math.round((Math.random() * (max - min) + min) / unitSize) * unitSize;
-        return randNum;
+        return Math.floor(Math.random() * (max - min + 1) / unitSize) * unitSize;
     }
     foodX = randomFood(0, gameWidth - unitSize);
     foodY = randomFood(0, gameWidth - unitSize);
@@ -87,7 +88,7 @@ function drawSnake() {
         ctx.strokeRect(snakePart.x, snakePart.y, unitSize, unitSize);
     })
 };
-function changeDirection() {
+function changeDirection(event) {
     const keyPressed = event.keyCode;
     const LEFT = 37;
     const UP = 38;
@@ -119,29 +120,25 @@ function changeDirection() {
     }
 };
 function checkGameOver() {
-    switch(true){
-        case(snake[0].x < 0):
-            running = false;
-            break;
-        case(snake[0].x >= gameWidth):
-            running = false;
-            break;
-        case(snake[0].y < 0):
-            running = false;
-            break;
-        case(snake[0].y >= gameHeight):
-            running = false;
-            break;
+    if (
+        snake[0].x < 0 ||
+        snake[0].x >= gameWidth ||
+        snake[0].y < 0 ||
+        snake[0].y >= gameHeight
+    ) {
+        running = false;
     }
-    for(let i = 1; i < snake.length; i+=1){
-        if(snake[i].x == snake[0].x && snake[i].y == snake[0].y){
+    
+    for (let i = 1; i < snake.length; i += 1) {
+        if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) {
             running = false;
+            break;
         }
-    }   
+    }  
 };
 function displayGameOver() {
     ctx.font = "80px myGameOver";
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.fillText("Game Over", gameWidth / 2, gameHeight / 2);
     running = false;
@@ -157,5 +154,6 @@ function resetGame() {
         {x:unitSize, y:0},
         {x:0, y:0}
     ];
-    gameStart();
+    clearTimeout(tickTimeout);
+    gameStart()
 };
